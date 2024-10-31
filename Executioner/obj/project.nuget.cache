@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "/n4fLF38dKk=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\mymob\\Desktop\\Executioner\\Executioner.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\mymob\\.nuget\\packages\\microsoft.web.webview2\\1.0.2739.15\\microsoft.web.webview2.1.0.2739.15.nupkg.sha512"
+  ],
+  "logs": []
+}
