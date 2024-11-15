@@ -1,5 +1,3 @@
-let forestExsits = true;
-
 document.body = document.createElement("body");
 const world_size = 1600;
 const world_row = 64;
@@ -33,32 +31,65 @@ if(localStorage.biome == 4){
     woodAmnt = 0;
 }
 // Desert, Icy, Cave
-if(localStorage.biome == 5 || localStorage.biome == 6 || localStorage.biome == 7)
-    forestExsits = false;
 let tiles = [];
 let river = [];
 const world = document.createElement("p");
 document.body.appendChild(world);
-if(forestExsits){
     for (let index = 0; index < world_size + 1; index++) {
         if (index % world_row === 0)
             world.innerHTML += "\n";
-    
-        let greenShade = Math.floor(Math.random() * (252 - 150 + 1)) + 150;
-        world.innerHTML += `<span style="color:rgb(0, ${greenShade}, 0);">g</span>`;
+        
+        if(localStorage.biome < 5){
+            let greenShade = Math.floor(Math.random() * (252 - 150 + 1)) + 150;
+            world.innerHTML += `<span style="color:rgb(0, ${greenShade}, 0);">g</span>`;
+        }
+        // Desert
+        if(localStorage.biome == 5){
+            let orangeShade = Math.floor(Math.random() * (252 - 150 + 1)) + 150;
+            world.innerHTML += `<span style="color:rgb(250, ${orangeShade}, 0);">s</span>`;
+        }
+        // Icy
+        if(localStorage.biome == 6){
+            let whiteShade = Math.floor(Math.random() * (255 - 200 + 1)) + 200;
+            world.innerHTML += `<span style="color:rgb(${whiteShade}, ${whiteShade}, ${whiteShade});">s</span>`;
+        }
+        // Cave
+        if(localStorage.biome == 7)
+            world.innerHTML += `<span style="color:rgb(${28}, ${28}, ${28});">s</span>`;
+
         tiles.push(world.children[index]);
     }
-    tiles.pop();
-    world.lastChild.remove();
+tiles.pop();
+world.lastChild.remove();
     
+if(localStorage.biome == 1 || localStorage.biome == 2 || localStorage.biome == 3){
     NewTile("t", "", treeAmnt, "g");
     NewTile("r", "grey", rockAmnt, "g");
     NewTile("W", "orange", woodAmnt, "g");
     Water();
 }
+// Ocean
+if(localStorage.biome == 4){
+    Water();
+}
+// Desert
+if(localStorage.biome == 5){
+    NewTile("C", "green", 50, "s");
+}
+// Icy
+if(localStorage.biome == 6){
+    NewTile("I", "blue", 600, "s");
+}
+// Cave
+if(localStorage.biome == 7){
+    NewTile("i", "#ababab", 50, "s");
+    NewTile("c", "#2e2e2e", 50, "s");
+    rockAmnt = 450;
+    NewTile("r", "grey", rockAmnt, "s");
+}
 
 function Water() {
-    let startingIndex = Math.floor(Math.random() * (world_size - 1));
+    let startingIndex = RndmTile();
     
     let min_s = world_row;
     let max_s = world_row * 7;
@@ -71,11 +102,10 @@ function Water() {
     let randomSize = Math.floor(Math.random() * (max_s - min_s + 1)) + min_s;
 
     // Horizontal
-    for (let index = 1; index <= randomSize; index++) {
-        if(startingIndex + index <= (world_size - 1)){
-            tiles[startingIndex + index].style.color = world.children[startingIndex + index].style.color = "cyan";
-            tiles[startingIndex + index].innerText = world.children[startingIndex + index].innerText = "w";
-            river.push(world.children[startingIndex + index]);
+    for (let i = 1; i <= randomSize; i++) {
+        if(startingIndex + i <= (world_size - 1)){
+            ReplaceTile(startingIndex + i, "w", "cyan");
+            river.push(world.children[startingIndex + i]);
         }
     }
     // Clumps
@@ -83,21 +113,16 @@ function Water() {
     for (let index = 0; index < randomAmnt_c; index++) {
         let startingIndex_c = Math.floor(Math.random() * ((world_size - 1) - (world_row - 1)));
 
-        tiles[startingIndex_c].style.color = world.children[startingIndex_c].style.color = "cyan";
-        tiles[startingIndex_c].innerText = world.children[startingIndex_c].innerText = "w";
-        tiles[startingIndex_c + 1].style.color = world.children[startingIndex_c + 1].style.color = "cyan";
-        tiles[startingIndex_c + 1].innerText = world.children[startingIndex_c + 1].innerText = "w";
-        //
-        tiles[startingIndex_c + (world_row + (startingIndex_c % world_row)) - (startingIndex_c % world_row)].style.color = world.children[startingIndex_c + (world_row + (startingIndex_c % world_row)) - (startingIndex_c % world_row)].style.color = "cyan";
-        tiles[startingIndex_c + (world_row + (startingIndex_c % world_row)) - (startingIndex_c % world_row)].innerText = world.children[startingIndex_c + (world_row + (startingIndex_c % world_row)) - (startingIndex_c % world_row)].innerText = "w";
-        tiles[(startingIndex_c + (world_row + (startingIndex_c % world_row)) - (startingIndex_c % world_row)) + 1].style.color = world.children[(startingIndex_c + (world_row + (startingIndex_c % world_row)) - (startingIndex_c % world_row)) + 1].style.color = "cyan";
-        tiles[(startingIndex_c + (world_row + (startingIndex_c % world_row)) - (startingIndex_c % world_row)) + 1].innerText = world.children[(startingIndex_c + (world_row + (startingIndex_c % world_row)) - (startingIndex_c % world_row)) + 1].innerText = "w";
+        ReplaceTile(startingIndex_c, "w", "cyan");
+        ReplaceTile(startingIndex_c + 1, "w", "cyan");
+        ReplaceTile(startingIndex_c + (world_row + (startingIndex_c % world_row)) - (startingIndex_c % world_row), "w", "cyan");
+        ReplaceTile(startingIndex_c + (world_row + (startingIndex_c % world_row)) - (startingIndex_c % world_row) + 1, "w", "cyan");
     }
 }
 
 function NewTile(type, clr, amnt, canReplace) {
     for (let index = 0; index < amnt; index++) {
-        let rndmIndex = Math.floor(Math.random() * (world_size - 1));
+        let rndmIndex = RndmTile();
         if (world.children[rndmIndex].innerText == canReplace) {
             if(type == "t"){
                 let rndmClr = Math.floor(Math.random() * 100);

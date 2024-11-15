@@ -60,7 +60,7 @@ function Fish(){
                     }
                     break;
                 }
-                setTimeout(() => {
+                setTimeout(() => {//⛏
                     river[initialIndexes[i]].innerText = '𓆟';
                 }, 150);
                 setTimeout(() => {
